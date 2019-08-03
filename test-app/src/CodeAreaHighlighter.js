@@ -89,10 +89,14 @@ export const CodeAreaHighlighter = ({ text$, op$ }) => {
 
       const text = text$.getValue();
 
-      const edit = {
+      const edit = c.si ? {
         startIndex: c.p[0],
         oldEndIndex: c.p[0],
         newEndIndex: c.p[0] + c.si.length
+      } : {
+        startIndex: c.p[0],
+        oldEndIndex: c.p[0] + c.sd.length,
+        newEndIndex: c.p[0]
       };
 
       edit.startPosition = positionFromIndex(edit.startIndex, text);
