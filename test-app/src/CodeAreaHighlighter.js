@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState, Fragment } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import Parser from 'web-tree-sitter';
 
 const setupParser = async () => {
@@ -9,31 +9,36 @@ const setupParser = async () => {
   return parser;
 };
 
-const getClassName = type => {
-  if(type === 'identifier' || type === 'string'){
-    return type;
-  }
-  return null;
+const highlightClasses = {
+  identifier: 'identifier',
+  string: 'string'
+};
+
+const getClassName = type => highlightClasses[type];
+
+const Highlight = ({ node, children }) => {
+  const className = getClassName(node.type);
+  return className ? (
+    <span className={className} key={node.id}>
+      {children}
+    </span>
+  ) : children;
 };
 
 const walkTree = (text, tree) => {
   let previousIndex = 0;
-  const walk = node => {
-    if (node.childCount > 0 && node.type !== 'string') {
-      return <Fragment key={node.id}>{node.children.map(walk)}</Fragment>;
-    } else {
-      const str = text.substring(previousIndex, node.endIndex);
-      previousIndex = node.endIndex;
-      const className = getClassName(node.type);
-      return className ? (
-        <span className={className} key={node.id}>
-          {str}
-        </span>
-      ) : (
-        <Fragment key={node.id}>{str}</Fragment>
-      );
-    }
+
+  const getStr = node => {
+    const str = text.substring(previousIndex, node.endIndex);
+    previousIndex = node.endIndex;
+    return str;
   };
+
+  const walk = node => (
+    <Highlight node={node}>
+      {node.childCount > 0 ? node.children.map(walk) : getStr(node)}
+    </Highlight>
+  );
   return walk(tree.rootNode);
 };
 
