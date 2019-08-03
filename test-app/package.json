@@ -2,13 +2,15 @@
   "name": "codearea-test-app",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:4000",
   "dependencies": {
     "diff-match-patch": "^1.0.4",
     "json0-ot-diff": "^1.0.5",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",
-    "rxjs": "^6.5.2"
+    "rxjs": "^6.5.2",
+    "web-tree-sitter": "^0.15.9"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -33,6 +35,9 @@
     ]
   },
   "devDependencies": {
-    "prettier": "^1.18.2"
+    "express": "^4.17.1",
+    "prettier": "^1.18.2",
+    "tree-sitter-cli": "^0.15.7",
+    "tree-sitter-javascript": "^0.15.1"
   }
 }

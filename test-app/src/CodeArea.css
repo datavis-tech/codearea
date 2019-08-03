@@ -1,0 +1,31 @@
+.code-area {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  width: 600px;
+  height: 500px;
+  position: relative;
+
+  margin: 0;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.code-area textarea {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.code-area pre {
+  color: blue;
+  pointer-events: none;
+}
+
+.code-area textarea, .code-area pre {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  margin: inherit;
+  padding: inherit;
+  font-size: inherit;
+}
