@@ -23,7 +23,7 @@ function App() {
 
   return (
     <div className="App">
-      <CodeArea text$={text$} op$={op$}/>
+      <CodeArea text$={text$} op$={op$} />
     </div>
   );
 }

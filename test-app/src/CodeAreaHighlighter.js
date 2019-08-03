@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Parser from 'web-tree-sitter';
 
 const setupParser = async () => {
@@ -40,24 +40,45 @@ const walkTree = (text, tree) => {
   return walk(tree.rootNode);
 };
 
-export const CodeAreaHighlighter = ({ text$ }) => {
+export const CodeAreaHighlighter = ({ text$, op$ }) => {
   const [parser, setParser] = useState();
-  const [tree, setTree] = useState();
+  const [highlighted, setHighlighted] = useState(null);
 
   useEffect(() => {
     setupParser().then(setParser);
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!parser) {
       return;
     }
-    // TODO set edit for efficient updates
-    return text$.subscribe(text => {
-      setTree(parser.parse(text));
-    }).unsubscribe;
-  }, [parser, text$]);
 
-  return <pre>{tree ? walkTree(text$.getValue(), tree) : null}</pre>;
-  //return <pre>{text}</pre>;
+    // Initialize the tree.
+    const text = text$.getValue();
+    let tree = parser.parse(text);
+    setHighlighted(walkTree(text, tree));
+
+    return op$.subscribe(op => {
+      // TODO set edit for efficient updates, derived from op.
+      // console.log(op);
+
+      //tree.edit({
+      //  startIndex: 0,
+      //  oldEndIndex: 3,
+      //  newEndIndex: 5,
+      //  startPosition: {row: 0, column: 0},
+      //  oldEndPosition: {row: 0, column: 3},
+      //  newEndPosition: {row: 0, column: 5},
+      //});
+      // tree = parser.parse(text$.getValue(), tree);
+       
+      const text = text$.getValue();
+      tree = parser.parse(text);
+      setHighlighted(walkTree(text, tree));
+
+      //setTree(parser.parse(text$.getValue()));
+    }).unsubscribe;
+  }, [parser, text$, op$]);
+
+  return <pre>{highlighted}</pre>;
 };
