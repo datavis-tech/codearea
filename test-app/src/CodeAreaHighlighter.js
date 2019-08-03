@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment} from 'react';
 import Parser from 'web-tree-sitter';
 
 const setupParser = async () => {
@@ -9,21 +9,25 @@ const setupParser = async () => {
   return parser;
 };
 
-const walk = (node, tokens) => {
-  if (node.childCount > 0 && node.type !== 'string') {
-    for (let i = 0; i < node.childCount; i++) {
-      walk(node.children[i], tokens);
+// && node.type !== 'string'
+const walkTree = (text, tree) => {
+  let previousIndex = 0;
+  const walk = node => {
+    if (node.childCount > 0) {
+      return <Fragment key={node.id}>{node.children.map(walk)}</Fragment>
+    } else {
+      const str = text.substring(previousIndex, node.endIndex);
+      previousIndex = node.endIndex;
+      return <span key={node.id}>{str}</span>;
     }
-  } else {
-    tokens.push(node.text);
-  }
-  return tokens;
-};
+  };
+  return walk(tree.rootNode);
+}
 
 export const CodeAreaHighlighter = ({ text$ }) => {
   const [text, setText] = useState();
   const [parser, setParser] = useState();
-  const [tokens, setTokens] = useState();
+  const [tree, setTree] = useState();
 
   useEffect(() => text$.subscribe(setText).unsubscribe, [text$, setText]);
 
@@ -35,14 +39,12 @@ export const CodeAreaHighlighter = ({ text$ }) => {
     if (!parser) {
       return;
     }
-    const tree = parser.parse(text);
-    console.log(tree.rootNode.toString());
-
-    setTokens(walk(tree.rootNode, []));
+    // TODO set edit for efficient updates
+    setTree(parser.parse(text));
   }, [parser, text]);
 
   return (
-    <pre>{tokens ? tokens.map((token, i) => <span key={i}>{token}</span>) : text}</pre>
+    <pre>{tree ? walkTree(text, tree) : text}</pre>
   );
   //return <pre>{text}</pre>;
 };
