@@ -1,14 +1,15 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { generateOp } from './generateOp';
 
-export const useOps = (text, opSubject) => {
+export const useOps = (text, op$) => {
   const previousText = useRef();
   useEffect(() => {
-    if(previousText.current !== undefined) {
-      console.log('text changed');
+    if (previousText.current !== undefined) {
+      op$.next(generateOp(previousText.current, text));
     } else {
       console.log('text initialized');
-      previousText.current = text;
     }
+    previousText.current = text;
     //const textarea = textareaRef.current;
     //let previousValue = textarea.value;
     //const onTextChange = () => {
