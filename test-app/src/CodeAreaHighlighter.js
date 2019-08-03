@@ -17,21 +17,24 @@ const highlightClasses = {
 const walkTree = (text, tree) => {
   let previousIndex = 0;
 
-  // This approach is required because node.text doesn't include whitespace.
-  const getStr = node => {
-    const str = text.substring(previousIndex, node.endIndex);
-    previousIndex = node.endIndex;
-    return str;
-  };
-
   const walk = node => {
-    const children = node.childCount > 0 ? node.children.map(walk) : getStr(node);
+    let children;
+    if (node.childCount > 0) {
+      children = node.children.map(walk);
+    } else {
+      // This approach is required because node.text doesn't include whitespace.
+      children = text.substring(previousIndex, node.endIndex);
+      previousIndex = node.endIndex;
+    }
+
     const className = highlightClasses[node.type];
     return className ? (
       <span className={className} key={node.id}>
         {children}
       </span>
-    ) : children;
+    ) : (
+      children
+    );
   };
 
   return walk(tree.rootNode);
