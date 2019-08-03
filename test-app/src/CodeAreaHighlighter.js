@@ -14,31 +14,26 @@ const highlightClasses = {
   string: 'string'
 };
 
-const getClassName = type => highlightClasses[type];
-
-const Highlight = ({ node, children }) => {
-  const className = getClassName(node.type);
-  return className ? (
-    <span className={className} key={node.id}>
-      {children}
-    </span>
-  ) : children;
-};
-
 const walkTree = (text, tree) => {
   let previousIndex = 0;
 
+  // This approach is required because node.text doesn't include whitespace.
   const getStr = node => {
     const str = text.substring(previousIndex, node.endIndex);
     previousIndex = node.endIndex;
     return str;
   };
 
-  const walk = node => (
-    <Highlight node={node}>
-      {node.childCount > 0 ? node.children.map(walk) : getStr(node)}
-    </Highlight>
-  );
+  const walk = node => {
+    const children = node.childCount > 0 ? node.children.map(walk) : getStr(node);
+    const className = highlightClasses[node.type];
+    return className ? (
+      <span className={className} key={node.id}>
+        {children}
+      </span>
+    ) : children;
+  };
+
   return walk(tree.rootNode);
 };
 
