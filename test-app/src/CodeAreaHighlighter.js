@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, useLayoutEffect, useState, Fragment } from 'react';
 import Parser from 'web-tree-sitter';
 
 const setupParser = async () => {
@@ -10,17 +10,16 @@ const setupParser = async () => {
 };
 
 const getClassName = type => {
-  if(type === 'identifier'){
+  if(type === 'identifier' || type === 'string'){
     return type;
   }
   return null;
 };
 
-// && node.type !== 'string'
 const walkTree = (text, tree) => {
   let previousIndex = 0;
   const walk = node => {
-    if (node.childCount > 0) {
+    if (node.childCount > 0 && node.type !== 'string') {
       return <Fragment key={node.id}>{node.children.map(walk)}</Fragment>;
     } else {
       const str = text.substring(previousIndex, node.endIndex);
@@ -49,7 +48,7 @@ export const CodeAreaHighlighter = ({ text$ }) => {
     setupParser().then(setParser);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!parser) {
       return;
     }

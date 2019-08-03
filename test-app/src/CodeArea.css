@@ -16,6 +16,9 @@
   color: transparent;
   caret-color: black;
 }
+.code-area textarea::selection {
+  background: #e7e7e7;
+}
 
 .code-area pre {
   color: #222;
@@ -34,4 +37,8 @@
 
 .code-area pre .identifier {
   color: #d3004e;
+}
+
+.code-area pre .string {
+  color: #006edf;
 }
