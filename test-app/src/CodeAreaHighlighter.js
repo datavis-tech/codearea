@@ -41,8 +41,15 @@ const walkTree = (text, tree) => {
 };
 
 const positionFromIndex = (index, text) => {
-  let row = index;
+  let row = 0;
   let column = 0;
+  for(let i = 0; i < index; i++){
+    row++;
+    if(text[i] === '\n'){
+      column++;
+      row = 0;
+    }
+  }
   return { row, column };
 };
 
