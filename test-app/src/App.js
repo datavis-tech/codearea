@@ -1,33 +1,29 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import './App.css';
 import { initialText } from './initialText';
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { useOps } from './useOps';
+import { CodeArea } from './CodeArea';
 
 function App() {
-  const [text, setText] = useState(initialText);
-
+  const text$ = useMemo(() => new BehaviorSubject(initialText), []);
   const op$ = useMemo(() => new Subject(), []);
 
-  useOps(text, op$);
+  useOps(text$, op$);
 
-  useEffect(() => {
-    op$.subscribe({
-      next: v => console.log(`observerB: ${v}`)
-    });
-  }, []);
-
-  const onTextChange = event => {
-    setText(event.target.value);
-  };
+  useEffect(
+    () =>
+      op$.subscribe({
+        next: op => {
+          console.log(op);
+        }
+      }).unsubscribe,
+    [op$]
+  );
 
   return (
     <div className="App">
-      <textarea
-        value={text}
-        onChange={onTextChange}
-        className="codearea-textarea"
-      />
+      <CodeArea text$={text$} />
     </div>
   );
 }
