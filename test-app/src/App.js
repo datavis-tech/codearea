@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import './App.css';
 import { initialText } from './initialText';
 import { Subject, BehaviorSubject } from 'rxjs';
@@ -11,19 +11,19 @@ function App() {
 
   useOps(text$, op$);
 
-  useEffect(
-    () =>
-      op$.subscribe({
-        next: op => {
-          console.log(op);
-        }
-      }).unsubscribe,
-    [op$]
-  );
+  //useEffect(
+  //  () =>
+  //    op$.subscribe({
+  //      next: op => {
+  //        console.log(op);
+  //      }
+  //    }).unsubscribe,
+  //  [op$]
+  //);
 
   return (
     <div className="App">
-      <CodeArea text$={text$} />
+      <CodeArea text$={text$} op$={op$}/>
     </div>
   );
 }

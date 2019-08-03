@@ -41,11 +41,8 @@ const walkTree = (text, tree) => {
 };
 
 export const CodeAreaHighlighter = ({ text$ }) => {
-  const [text, setText] = useState();
   const [parser, setParser] = useState();
   const [tree, setTree] = useState();
-
-  useEffect(() => text$.subscribe(setText).unsubscribe, [text$, setText]);
 
   useEffect(() => {
     setupParser().then(setParser);
@@ -56,9 +53,11 @@ export const CodeAreaHighlighter = ({ text$ }) => {
       return;
     }
     // TODO set edit for efficient updates
-    setTree(parser.parse(text));
-  }, [parser, text]);
+    return text$.subscribe(text => {
+      setTree(parser.parse(text));
+    }).unsubscribe;
+  }, [parser, text$]);
 
-  return <pre>{tree ? walkTree(text, tree) : text}</pre>;
+  return <pre>{tree ? walkTree(text$.getValue(), tree) : null}</pre>;
   //return <pre>{text}</pre>;
 };
