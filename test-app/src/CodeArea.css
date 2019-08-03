@@ -13,10 +13,12 @@
   width: 100%;
   height: 100%;
   border: none;
+  color: transparent;
+  caret-color: black;
 }
 
 .code-area pre {
-  color: blue;
+  color: #222;
   pointer-events: none;
 }
 
@@ -28,4 +30,8 @@
   margin: inherit;
   padding: inherit;
   font-size: inherit;
+}
+
+.code-area pre .identifier {
+  color: #d3004e;
 }

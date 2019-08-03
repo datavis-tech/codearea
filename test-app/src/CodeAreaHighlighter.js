@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment} from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import Parser from 'web-tree-sitter';
 
 const setupParser = async () => {
@@ -9,20 +9,34 @@ const setupParser = async () => {
   return parser;
 };
 
+const getClassName = type => {
+  if(type === 'identifier'){
+    return type;
+  }
+  return null;
+};
+
 // && node.type !== 'string'
 const walkTree = (text, tree) => {
   let previousIndex = 0;
   const walk = node => {
     if (node.childCount > 0) {
-      return <Fragment key={node.id}>{node.children.map(walk)}</Fragment>
+      return <Fragment key={node.id}>{node.children.map(walk)}</Fragment>;
     } else {
       const str = text.substring(previousIndex, node.endIndex);
       previousIndex = node.endIndex;
-      return <span key={node.id}>{str}</span>;
+      const className = getClassName(node.type);
+      return className ? (
+        <span className={className} key={node.id}>
+          {str}
+        </span>
+      ) : (
+        <Fragment key={node.id}>{str}</Fragment>
+      );
     }
   };
   return walk(tree.rootNode);
-}
+};
 
 export const CodeAreaHighlighter = ({ text$ }) => {
   const [text, setText] = useState();
@@ -43,8 +57,6 @@ export const CodeAreaHighlighter = ({ text$ }) => {
     setTree(parser.parse(text));
   }, [parser, text]);
 
-  return (
-    <pre>{tree ? walkTree(text, tree) : text}</pre>
-  );
+  return <pre>{tree ? walkTree(text, tree) : text}</pre>;
   //return <pre>{text}</pre>;
 };
