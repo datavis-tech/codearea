@@ -40,6 +40,12 @@ const walkTree = (text, tree) => {
   return walk(tree.rootNode);
 };
 
+const positionFromIndex = (index, text) => {
+  let row = index;
+  let column = 0;
+  return { row, column };
+};
+
 export const CodeAreaHighlighter = ({ text$, op$ }) => {
   const [parser, setParser] = useState();
   const [highlighted, setHighlighted] = useState(null);
@@ -60,20 +66,40 @@ export const CodeAreaHighlighter = ({ text$, op$ }) => {
 
     return op$.subscribe(op => {
       // TODO set edit for efficient updates, derived from op.
-      // console.log(op);
+      console.log(op);
+      if (op.length > 1) {
+        throw new Error("Can't handle ops with multiple components yet");
+      }
+      const c = op[0];
 
-      //tree.edit({
-      //  startIndex: 0,
-      //  oldEndIndex: 3,
-      //  newEndIndex: 5,
-      //  startPosition: {row: 0, column: 0},
-      //  oldEndPosition: {row: 0, column: 3},
-      //  newEndPosition: {row: 0, column: 5},
-      //});
-      // tree = parser.parse(text$.getValue(), tree);
-       
+      if (c.p.length > 1) {
+        throw new Error('Expecting path to be a single index');
+      }
+
+      if (!(c.si || c.sd)) {
+        throw new Error('Expecting only string insert or delete');
+      }
+
       const text = text$.getValue();
-      tree = parser.parse(text);
+
+      const edit = {
+        startIndex: c.p[0],
+        oldEndIndex: c.p[0],
+        newEndIndex: c.p[0] + c.si.length
+      };
+
+      edit.startPosition = positionFromIndex(edit.startIndex, text);
+      edit.oldEndPosition = positionFromIndex(edit.oldEndIndex, text);
+      edit.newEndPosition = positionFromIndex(edit.newEndIndex, text);
+
+      console.log(edit);
+
+      //console.log(parser);
+
+      tree.edit(edit);
+      tree = parser.parse(text, tree);
+
+      //tree = parser.parse(text);
       setHighlighted(walkTree(text, tree));
 
       //setTree(parser.parse(text$.getValue()));
