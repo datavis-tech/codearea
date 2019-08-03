@@ -43,9 +43,9 @@ const walkTree = (text, tree) => {
 const positionFromIndex = (index, text) => {
   let row = 0;
   let column = 0;
-  for(let i = 0; i < index; i++){
+  for (let i = 0; i < index; i++) {
     row++;
-    if(text[i] === '\n'){
+    if (text[i] === '\n') {
       column++;
       row = 0;
     }
@@ -72,48 +72,33 @@ export const CodeAreaHighlighter = ({ text$, op$ }) => {
     setHighlighted(walkTree(text, tree));
 
     return op$.subscribe(op => {
-      // TODO set edit for efficient updates, derived from op.
-      console.log(op);
-      if (op.length > 1) {
-        throw new Error("Can't handle ops with multiple components yet");
-      }
-      const c = op[0];
-
-      if (c.p.length > 1) {
-        throw new Error('Expecting path to be a single index');
-      }
-
-      if (!(c.si || c.sd)) {
-        throw new Error('Expecting only string insert or delete');
-      }
+      // Handle string insert, string delete,
+      // and string replace (one si and one sd, at same index).
+      let p, si, sd;
+      op.forEach(c => {
+        p = c.p;
+        si = c.si;
+        sd = c.sd;
+      });
 
       const text = text$.getValue();
 
-      const edit = c.si ? {
-        startIndex: c.p[0],
-        oldEndIndex: c.p[0],
-        newEndIndex: c.p[0] + c.si.length
-      } : {
-        startIndex: c.p[0],
-        oldEndIndex: c.p[0] + c.sd.length,
-        newEndIndex: c.p[0]
+      const edit = {
+        startIndex: p[0],
+        oldEndIndex: p[0] + (sd ? sd.length : 0),
+        newEndIndex: p[0] + (si ? si.length : 0)
       };
 
       edit.startPosition = positionFromIndex(edit.startIndex, text);
       edit.oldEndPosition = positionFromIndex(edit.oldEndIndex, text);
       edit.newEndPosition = positionFromIndex(edit.newEndIndex, text);
 
-      console.log(edit);
-
-      //console.log(parser);
-
+      // Incremental parsing happens here.
       tree.edit(edit);
       tree = parser.parse(text, tree);
 
-      //tree = parser.parse(text);
+      // Re-generate JSX for highlighting.
       setHighlighted(walkTree(text, tree));
-
-      //setTree(parser.parse(text$.getValue()));
     }).unsubscribe;
   }, [parser, text$, op$]);
 
