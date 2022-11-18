@@ -8,7 +8,7 @@
     "json0-ot-diff": "^1.0.5",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1",
+    "react-scripts": "5.0.1",
     "rxjs": "^6.5.2",
     "web-tree-sitter": "^0.15.9"
   },
